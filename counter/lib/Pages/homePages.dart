@@ -1,12 +1,13 @@
+import 'dart:developer';
 import 'dart:ui';
 
+import 'package:counter/Controllers/accountController.dart';
 import 'package:counter/Widget/expensesCategoryChart.dart';
 import 'package:counter/Widget/sectionHeders.dart';
 import 'package:counter/dataBaseHelper.dart';
 import 'package:counter/router/router.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -48,6 +49,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final AccountController controller = Get.put(AccountController());
+    log('${controller.accountList.length}');
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 249, 249, 249),
       body: SafeArea(
@@ -65,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onSeeAllPressed: () => Get.toNamed(Routes.addAccount),
               ),
               const SizedBox(height: 5),
-              _accountList(),
+              Obx(() => _accountList(controller)),
               const SizedBox(height: 10),
               const  Text(
                 'Spending Overview',
@@ -189,39 +192,40 @@ class _MyHomePageState extends State<MyHomePage> {
               );
   }
 
-  Widget _accountList(){
-    return   Container(
-                width:MediaQuery.of(context).size.width,
-                // height:50,
-                decoration:BoxDecoration(
-                  color:Colors.white,
-                  borderRadius:BorderRadius.circular(5),
-                ),
-                child:Column(children: [
-                  ListTile(
-                  leading:CircleAvatar(
-                    child:Icon(Icons.wallet)
+  Widget _accountList(AccountController controller){
+    final limitedList = controller.accountList.take(3).toList();
+    return   Flexible(
+                  child:ListView.builder(
+                    shrinkWrap: true, 
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount:limitedList.length,
+                    itemBuilder: (context,index){
+                    return Container(
+                  width:MediaQuery.of(context).size.width,
+                  padding:EdgeInsets.symmetric(
+                    horizontal:10,
+                    vertical:5,
                   ),
-                  title:const Text('Main Account',style:TextStyle(fontWeight:FontWeight.bold)),
-                  trailing: const Text('₹120.00'),
-                ),
-                ListTile(
-                  leading:CircleAvatar(
-                    child:Icon(Icons.wallet)
-                  ),
-                  title:const Text('Main Account',style:TextStyle(fontWeight:FontWeight.bold)),
-                  trailing: const Text('₹120.00'),
-                ),
-                 ListTile(
-                  leading:CircleAvatar(
-                    child:Icon(Icons.wallet)
-                  ),
-                  title:const Text('Main Account',style:TextStyle(fontWeight:FontWeight.bold)),
-                  trailing: const Text('₹120.00'),
-                )
-                ],)
-              );
-           
+                  decoration:BoxDecoration(
+                    color:Colors.white,
+                  ),child: ListTile(
+                        leading: CircleAvatar(
+                            radius: 25,
+                            backgroundColor: controller.lightColors[index % controller.lightColors.length][100]!,
+                            child: Icon(controller.accountList[index]['icon'],color:controller.lightColors[index % controller.lightColors.length]),
+                          ),
+                          title:Text(controller.accountList[index]['name'],style:TextStyle(
+                            fontWeight:FontWeight.bold,
+                            fontSize:18
+                          )),
+                          trailing:Text('₹${controller.accountList[index]["balance"]}.00',style:TextStyle(
+                            fontWeight:FontWeight.bold,
+                            fontSize:15,
+                            color:Colors.grey[700]
+                          ))
+                    ));
+                  })
+                );    
   }
 
 }

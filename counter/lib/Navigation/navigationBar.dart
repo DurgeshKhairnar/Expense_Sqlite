@@ -2,7 +2,9 @@ import 'package:counter/Navigation/customNavBar.dart';
 import 'package:counter/Pages/budget.dart';
 import 'package:counter/Pages/homePages.dart';
 import 'package:counter/Pages/transactionPage.dart';
+import 'package:counter/router/router.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -41,9 +43,7 @@ class _MainScreenState extends State<MainScreen> {
             _currentIndex = index;
           });
         },
-        onAddPressed: () {
-          // Handle your center '+' button click (e.g., show bottom sheet)
-        },
+        onAddPressed: () => Get.toNamed(Routes.calculatorScreen),
       ),
     );
   }
