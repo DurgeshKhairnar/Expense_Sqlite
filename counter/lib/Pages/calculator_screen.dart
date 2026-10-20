@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:counter/Controllers/accountController.dart';
+import 'package:counter/Controllers/categoryController.dart';
+import 'package:counter/Controllers/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:math_expressions/math_expressions.dart';
@@ -12,6 +16,8 @@ class Calculate extends StatefulWidget {
 
 class _CalculateState extends State<Calculate> {
   String expression = '';
+
+  final TextEditingController note = TextEditingController();
 
   final List<String> buttons = [
     'C',
@@ -143,6 +149,8 @@ class _CalculateState extends State<Calculate> {
   @override
   Widget build(BuildContext context) {
     final AccountController accountController = Get.find<AccountController>();
+    final CategoryController categoryController = Get.find<CategoryController>();
+    final TransactionController transactionController = Get.find<TransactionController>();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -152,13 +160,44 @@ class _CalculateState extends State<Calculate> {
             child: Column(
               children: [
                 Align(
-                  alignment:Alignment.centerLeft,
-                  child: Text('Select Account',style:TextStyle(fontWeight:FontWeight.bold))),
-                accountList(accountController),
-                const SizedBox(height: 10),
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Select Account',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                accountList(accountController , transactionController),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Select Category',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                categoryList(categoryController , transactionController),
+                const SizedBox(height: 3),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: note,
+                      decoration: InputDecoration(
+                        hintText: 'Add Note (optional)',
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 3),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(15),
                   alignment: Alignment.centerRight,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade300,
@@ -170,13 +209,13 @@ class _CalculateState extends State<Calculate> {
                     child: Text(
                       expression.isEmpty ? '0' : expression,
                       maxLines: 1,
-                      style: const TextStyle(fontSize: 36, color: Colors.black),
+                      style: const TextStyle(fontSize: 30, color: Colors.black),
                     ),
                   ),
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
-                  height: 390,
+                  height: 350,
                   child: GridView.builder(
                     itemCount: buttons.length,
                     gridDelegate:
@@ -184,7 +223,7 @@ class _CalculateState extends State<Calculate> {
                           crossAxisCount: 4,
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
-                          childAspectRatio: 1.3,
+                          childAspectRatio: 1.4,
                         ),
                     itemBuilder: (context, index) {
                       final value = buttons[index];
@@ -229,19 +268,31 @@ class _CalculateState extends State<Calculate> {
                     },
                   ),
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Add Expenses',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                GestureDetector(
+                  onTap:(){
+                     log('$expression');
+                    transactionController.addExpenses.add({
+                        'categoryName':transactionController.categoryName.value,
+                        'accountName':transactionController.accountName.value,
+                        'icon':transactionController.icon.value,
+                        'expenses':transactionController.expenses.value
+                    });
+                    log('${transactionController.addExpenses.length}');
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Add Expenses',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -253,45 +304,137 @@ class _CalculateState extends State<Calculate> {
     );
   }
 
-  Widget accountList(AccountController accountController) {
-    return SizedBox(
-      height: 100,
-      child: ListView.builder(
+ 
+Widget accountList(AccountController accountController , TransactionController transactionController) {
+  return SizedBox(
+    height: 90,
+    child: Obx(() {
+      final selectedName = accountController.selectContainer.value;
+      final totalAccounts = accountController.accountList.length;
+
+      return ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: accountController.accountList.length,
+        itemCount: totalAccounts,
         itemBuilder: (context, index) {
+   
           final account = accountController.accountList[index];
-          return Container(
-            height: 30,
-            margin: EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal:20, vertical:5),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(account['icon'], color: Colors.red[800]),
-                  const SizedBox(height: 5),
-                  Text(
-                    account['name'],
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 15,fontWeight:FontWeight.bold),
-                  ),
-                  Text(
-                    '₹${account["balance"]}',
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                ],
+          final isSelected = selectedName == account['name'];
+          final icon = IconData(account['iconCode'],fontFamily: 'MaterialIcons');
+
+          final borderColor = isSelected
+              ? Colors.blue
+              : Colors.grey.shade300;
+
+          return GestureDetector(
+            onTap: () {
+              accountController.selectContainer.value = account['name'];
+              transactionController.accountName.value = account['name'];
+            },
+            child: Container(
+              height: 25,
+              margin: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: borderColor,
+                  width: isSelected ? 2 : 1,
+                ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 3,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      color: Colors.red[800],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      account['name'].toString(),
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '₹${account["balance"]}',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
         },
-      ),
+      );
+    }),
+  );
+}
+
+  Widget categoryList(CategoryController categoryController, TransactionController transactionController) {
+      return SizedBox(
+      height: 90,
+      child: Obx(() { 
+        final categoryList =  categoryController.categoryList;
+        final selectName = categoryController.selectCategory.value;
+        return ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: categoryList.length,
+        itemBuilder: (context, index) {
+          final category = categoryList[index];
+          final isSelected = (selectName == category['name']);
+          final borderColor = isSelected
+              ? Colors.blue
+              : Colors.grey.shade300;
+          final int iconCode = category['iconCode'] ?? Icons.category.codePoint;
+        final iconData = IconData(iconCode, fontFamily: 'MaterialIcons');
+        final int colorValue = category['color'] ?? Colors.blue.value;
+        final Color categoryColor = Color(colorValue);
+          return GestureDetector(
+            onTap:(){
+                log('$expression');
+                categoryController.selectCategory.value = category['name'];
+                transactionController.categoryName.value = category['name'];
+                transactionController.expenses.value = expression;
+                transactionController.icon.value = category['icon'];
+            },
+            child: Container(
+              height: 25,
+              margin: EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: borderColor,width:isSelected ? 2 : 1),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(iconData, color: categoryColor),
+                    const SizedBox(height: 3),
+                    Text(
+                      category['name'],
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ); }) 
     );
   }
 }

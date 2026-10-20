@@ -1,16 +1,21 @@
+import 'package:counter/Controllers/categoryController.dart';
+import 'package:counter/Controllers/transaction.dart';
 import 'package:counter/router/pages.dart';
 import 'package:counter/router/router.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 void main() {
+   Get.put(CategoryController());
+   Get.put(TransactionController());
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(

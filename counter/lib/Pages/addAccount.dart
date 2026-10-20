@@ -1,6 +1,8 @@
+import 'dart:developer';
 
 import 'package:counter/Controllers/accountController.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 
 class AccountPage extends StatefulWidget {
@@ -53,14 +55,14 @@ class _AccountPage extends State<AccountPage> {
                 ),
               ),
               const SizedBox(height: 10),
-             Obx(() =>_addAccountList(controller)),
+              Obx(() => _addAccountList(controller)),
             ],
           ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ElevatedButton(
-        onPressed: () => _addAccountPop(controller),
+        onPressed: () => _addAccountPop(controller,null),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.indigo,
           foregroundColor: Colors.white,
@@ -70,7 +72,16 @@ class _AccountPage extends State<AccountPage> {
     );
   }
 
-  void _addAccountPop(AccountController controller) {
+  void _addAccountPop(AccountController controller , int? id) {
+    if(id != null){
+        final account = controller.accountList.firstWhere((item) => item['id'] == id);
+         _accountNameController.text = account['name'];
+         _accountBalanceController.text = account['balance'].toString();
+         containerIcon = IconData(account['iconCode'],fontFamily:'MaterialIcons');
+      }else {
+        _accountNameController.text = '';
+        _accountBalanceController.text = '';
+    }
     showDialog(
       context: context,
       builder: (context) {
@@ -147,19 +158,28 @@ class _AccountPage extends State<AccountPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (_accountNameController.text != '' &&
+                    if(id != null){
+                        controller.updateAccount({
+                          'id': id,
+                          'name': _accountNameController.text.trim(),
+                          'balance':_accountBalanceController.text.trim(),
+                          'iconCode': containerIcon!.codePoint
+                        });
+                    }else{
+                        if (_accountNameController.text != '' &&
                       _accountBalanceController.text != '' &&
                       containerIcon != null) {
-                    controller.accountList.add({
-                      'icon': containerIcon,
-                      'name': _accountNameController.text.trim(),
-                      'balance': _accountBalanceController.text.trim(),
-                    });
+                    controller.addAccount(
+                      _accountNameController.text.trim(),
+                      _accountBalanceController.text.trim(),
+                        containerIcon!.codePoint);
+                      }
+                    }
+                    controller.loadData();
                     _accountNameController.clear();
                     _accountBalanceController.clear();
                     containerIcon = null;
                     Navigator.pop(context);
-                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple,
@@ -175,33 +195,66 @@ class _AccountPage extends State<AccountPage> {
   }
 
   Widget _addAccountList(AccountController controller) {
-   return Flexible(
+    log('${controller.accountList.length}');
+    return Flexible(
       child: ListView.builder(
         itemCount: controller.accountList.length,
         itemBuilder: (context, index) {
+          final account = controller.accountList[index];
+          final icon = IconData(
+            controller.accountList[index]['iconCode'],
+            fontFamily: 'MaterialIcons',
+          );
           return Container(
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             decoration: BoxDecoration(color: Colors.white),
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 24,
-                backgroundColor: lightColors[index % lightColors.length][100]!,
-                child: Icon(
-                  controller.accountList[index]['icon'],
-                  color: lightColors[index % lightColors.length],
+            child: Slidable(
+              endActionPane: ActionPane(
+                motion: const ScrollMotion(),
+                children: [
+                  SlidableAction(
+                    onPressed: (context) {
+                       _addAccountPop(controller,account['id']);
+                    },
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    icon: Icons.edit,
+                    label: 'Edit',
+                  ),
+                  SlidableAction(
+                    onPressed: (context) {
+                        controller.deleteAccount(account['id']);
+                        controller.loadData();
+                    },
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: 'Delete',
+                  ),
+                ],
+              ),
+              child: ListTile(
+                leading: CircleAvatar(
+                  radius: 24,
+                  backgroundColor:
+                      lightColors[index % lightColors.length][100]!,
+                  child: Icon(
+                    icon,
+                    color: lightColors[index % lightColors.length],
+                  ),
                 ),
-              ),
-              title: Text(
-                controller.accountList[index]['name'],
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              trailing: Text(
-                '₹${controller.accountList[index]["balance"]}.00',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: Colors.grey[700],
+                title: Text(
+                  account['name'],
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                trailing: Text(
+                  '₹${account["balance"]}.00',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Colors.grey[700],
+                  ),
                 ),
               ),
             ),
@@ -210,5 +263,4 @@ class _AccountPage extends State<AccountPage> {
       ),
     );
   }
-
 }

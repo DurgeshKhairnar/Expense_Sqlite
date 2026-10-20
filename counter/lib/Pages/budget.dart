@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:counter/Controllers/categoryController.dart';
 import 'package:counter/Widget/sectionHeders.dart';
 import 'package:counter/router/router.dart';
 import 'package:flutter/material.dart';
@@ -11,65 +14,10 @@ class BudgetPage extends StatefulWidget {
 }
 
 class _BudgetPage extends State<BudgetPage> {
-  final List<Map<String, dynamic>> categoryList = [
-    {
-      'name': 'Shopping',
-      'icon': Icons.shopping_bag,
-      'color': Colors.pink,
-      'expense': 0.0,
-    },
-    {
-      'name': 'Food & Dining',
-      'icon': Icons.restaurant,
-      'color': Colors.orange,
-      'expense': 0.0,
-    },
-    {
-      'name': 'Transport',
-      'icon': Icons.directions_car,
-      'color': Colors.blue,
-      'expense': 0.0,
-    },
-    {
-      'name': 'Bills',
-      'icon': Icons.receipt_long,
-      'color': Colors.red,
-      'expense': 0.0,
-    },
-    {
-      'name': 'Mobile Recharge',
-      'icon': Icons.phone_android,
-      'color': Colors.purple,
-      'expense': 0.0,
-    },
-    {
-      'name': 'Entertainment',
-      'icon': Icons.movie,
-      'color': Colors.deepPurple,
-      'expense': 0.0,
-    },
-    {
-      'name': 'Salary',
-      'icon': Icons.account_balance_wallet,
-      'color': Colors.green,
-      'expense': 0.0,
-    },
-    {
-      'name': 'Grocery Store',
-      'icon': Icons.local_grocery_store,
-      'color': Colors.teal,
-      'expense': 0.0,
-    },
-    {
-      'name': 'Tea & Coffee',
-      'icon': Icons.coffee,
-      'color': Colors.brown,
-      'expense': 0.0,
-    },
-  ];
 
   @override
   Widget build(BuildContext conetxt) {
+    final CategoryController categoryController = Get.find<CategoryController>();
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 249, 249, 249),
       body: SafeArea(
@@ -93,7 +41,7 @@ class _BudgetPage extends State<BudgetPage> {
                 onSeeAllPressed: () => Get.toNamed(Routes.addCategories),
               ),
               const SizedBox(height: 5),
-               _addAccountList()
+                Obx(() => _addAccountList(categoryController)),
             ],
           ),
         ),
@@ -101,11 +49,17 @@ class _BudgetPage extends State<BudgetPage> {
     );
   }
 
-  Widget _addAccountList() {
+  Widget _addAccountList(CategoryController categoryController) {
+    final categoryList = categoryController.categoryList;
     return Flexible(
-      child: ListView.builder(
-        itemCount: categoryList.length,
+      child: (categoryList.isEmpty) ?  const Text('List is Empty') : ListView.builder(
+        itemCount:categoryList.length,
         itemBuilder: (context, index) {
+          final category = categoryController.categoryList[index];
+          final int iconCode = category['iconCode'] ?? Icons.category.codePoint;
+        final iconData = IconData(iconCode, fontFamily: 'MaterialIcons');
+        final int colorValue = category['color'] ?? Colors.blue.value;
+        final Color categoryColor = Color(colorValue);
           return Container(
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -113,18 +67,18 @@ class _BudgetPage extends State<BudgetPage> {
             child: ListTile(
               leading: CircleAvatar(
                 radius: 24,
-                backgroundColor: categoryList[index]['color'][100]!,
+                backgroundColor: categoryColor.withOpacity(0.2),
                 child: Icon(
-                  categoryList[index]['icon'],
-                  color: categoryList[index]['color'][800],
+                  iconData,
+                  color: categoryColor,
                 ),
               ),
               title: Text(
-                categoryList[index]['name'],
+                category ['name'],
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               trailing: Text(
-                '₹${categoryList[index]["expense"]}.00'.toString(),
+                '₹${category ["expense"]}.00'.toString(),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,

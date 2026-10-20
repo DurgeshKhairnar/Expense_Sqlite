@@ -1,6 +1,9 @@
 
 
 
+import 'dart:developer';
+
+import 'package:counter/dataBaseHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
@@ -15,5 +18,36 @@ List<MaterialColor> lightColors = [
   Colors.deepPurple,
   Colors.indigo,
   Colors.blue,
-];
+].obs;
+
+   final selectContainer = ''.obs;
+
+
+   @override
+   void onInit(){
+     super.onInit();
+     loadData();
+   }
+
+   Future<void> loadData() async {
+    final myAccount = await DatabaseHelper.instance.getAccounts();
+    accountList.assignAll(myAccount);
+  }
+
+  Future<void> addAccount(String name, String balance , int iconCode) async{
+      await DatabaseHelper.instance.insertAccount({
+          'name':name,
+          'balance':balance,
+          'iconCode':iconCode
+      });
+  }
+
+    Future<void> deleteAccount(int id)async{
+      await DatabaseHelper.instance.deleteAccount(id);
+    }
+
+    Future<void> updateAccount(Map<String,dynamic> account)async{
+        log('$account');
+         await DatabaseHelper.instance.updateAccount(account);
+    }  
 }
