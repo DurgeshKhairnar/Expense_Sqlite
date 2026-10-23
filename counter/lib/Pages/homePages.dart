@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:ui';
 
 import 'package:counter/Controllers/accountController.dart';
@@ -200,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
-                  color: Colors.grey[700],
+                  color: Colors.green,
                 ),
               ),
             ),

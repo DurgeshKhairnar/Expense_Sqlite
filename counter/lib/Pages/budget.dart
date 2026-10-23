@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:counter/Controllers/categoryController.dart';
 import 'package:counter/Widget/sectionHeders.dart';

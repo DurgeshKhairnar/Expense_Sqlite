@@ -56,6 +56,7 @@ class DatabaseHelper {
               title TEXT NOT NULL,
               amount REAL NOT NULL,
               date TEXT NOT NULL,
+              iconCode INTEGER NOT NULL,
               accountId INTEGER,
               categoryId INTEGER,
               FOREIGN KEY (accountId) REFERENCES account(id),
@@ -117,6 +118,14 @@ class DatabaseHelper {
     );
   }   
 
+Future<void> updateAccountBalance(int id, double newBalance)async{
+  final db = await database;
+  await db.update('account',
+  {'balance' : newBalance},
+  where : 'id = ?',
+  whereArgs: [id],
+  );
+}
 
 ////////////////////////////// categories
 
@@ -205,4 +214,43 @@ class DatabaseHelper {
     final db = await database;
     return db.query('categories');
   }
+
+  Future<void> updateCategoryExpense(int id ,double expenses) async{
+  final db = await database;
+   await db.update(
+      'categories',
+      {'expense': expenses},
+      where : 'id = ?',
+      whereArgs:[id]
+    );
+ }
+
+///////////////////////////////// expenses ////
+
+Future<void> insertExpenses(Map<String,dynamic> expenses)async{
+  final db = await database;
+  db.insert('expenses',expenses);
 }
+
+  Future<List<Map<String, dynamic>>> getExpenses() async {
+    final db = await database;
+    return await db.rawQuery('''
+      SELECT expenses.*, 
+             account.name AS accountName, 
+             categories.name AS categoryName 
+      FROM expenses
+      LEFT JOIN account ON expenses.accountId = account.id
+      LEFT JOIN categories ON expenses.categoryId = categories.id
+    ''');
+  }
+
+  Future<void> deleteExpense(int id)async{
+    final db = await database;
+    await db.delete('expenses',
+    where : 'id = ?',
+    whereArgs:[id]
+    );
+  }
+
+}
+

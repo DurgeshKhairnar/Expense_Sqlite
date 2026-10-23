@@ -1,7 +1,6 @@
 
 
 
-import 'dart:developer';
 
 import 'package:counter/dataBaseHelper.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +46,15 @@ List<MaterialColor> lightColors = [
     }
 
     Future<void> updateAccount(Map<String,dynamic> account)async{
-        log('$account');
          await DatabaseHelper.instance.updateAccount(account);
     }  
+
+    Future<void> updateAccountBalance(int id , double expense)async{
+      final account = accountList.firstWhere((account) => account['id'] == id);
+      if(expense < account['balance']){
+        double newbalance = (account['balance'] - expense);
+        await DatabaseHelper.instance.updateAccountBalance(id, newbalance);
+      }
+      await loadData();
+    }
 }

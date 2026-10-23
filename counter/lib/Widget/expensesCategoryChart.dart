@@ -1,13 +1,17 @@
+import 'package:counter/Controllers/categoryController.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ExpenseCategoryChart extends StatelessWidget {
   const ExpenseCategoryChart({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final CategoryController categoryController =
+        Get.find<CategoryController>();
     return Container(
-      height: 200,
+      height: 220,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -22,76 +26,46 @@ class ExpenseCategoryChart extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 1. The Pie Chart
+  
           Expanded(
             flex: 1,
-            child: PieChart(
+            child: Obx(() {
+              return PieChart(
               PieChartData(
                 sectionsSpace: 2,
-                centerSpaceRadius: 35,
-                sections: [
-                  PieChartSectionData(
-                    color: Colors.deepPurple,
-                    value: 45,
-                    title: '45%',
-                    radius: 45,
+                centerSpaceRadius: 30,
+                sections: categoryController.categoryList.map((item) {
+                  final double amount = item['expense'] ?? 0.0;
+                  final Color color = Color(item['color'] ?? Colors.blue.value);
+                  return PieChartSectionData(
+                    color: color,
+                    value: amount,
+                    title: '₹${amount.toInt()}',
+                    radius: 55,
                     titleStyle: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
-                  ),
-                  PieChartSectionData(
-                    color: Colors.lightBlueAccent,
-                    value: 30,
-                    title: '30%',
-                    radius: 40,
-                    titleStyle: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  PieChartSectionData(
-                    color: Colors.orangeAccent,
-                    value: 25,
-                    title: '25%',
-                    radius: 40,
-                    titleStyle: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
-            ),
+            );
+            })
           ),
-          
           const SizedBox(width: 16),
-
-          // 2. Category Legend / Labels
           Expanded(
             flex: 1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                _ChartIndicator(
-                  color: Colors.deepPurple,
-                  text: 'Food & Dining',
-                ),
-                SizedBox(height: 10),
-                _ChartIndicator(
-                  color: Colors.lightBlueAccent,
-                  text: 'Shopping',
-                ),
-                SizedBox(height: 10),
-                _ChartIndicator(
-                  color: Colors.orangeAccent,
-                  text: 'Bills & Utilities',
-                ),
-              ],
+            child: Obx(
+              () => Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: categoryController.categoryList.map((item) {
+                  final Color color = Color(item['color'] ?? Colors.blue.value);
+                  final String name = item['name'] ?? '';
+                  return _ChartIndicator(color: color, text: name);
+                }).toList(),
+              ),
             ),
           ),
         ],
@@ -105,10 +79,7 @@ class _ChartIndicator extends StatelessWidget {
   final Color color;
   final String text;
 
-  const _ChartIndicator({
-    required this.color,
-    required this.text,
-  });
+  const _ChartIndicator({required this.color, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -117,10 +88,7 @@ class _ChartIndicator extends StatelessWidget {
         Container(
           width: 12,
           height: 12,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color,
-          ),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
         ),
         const SizedBox(width: 8),
         Text(

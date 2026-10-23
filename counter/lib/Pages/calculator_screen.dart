@@ -270,14 +270,20 @@ class _CalculateState extends State<Calculate> {
                 ),
                 GestureDetector(
                   onTap:(){
-                     log('$expression');
-                    transactionController.addExpenses.add({
-                        'categoryName':transactionController.categoryName.value,
-                        'accountName':transactionController.accountName.value,
-                        'icon':transactionController.icon.value,
-                        'expenses':transactionController.expenses.value
-                    });
-                    log('${transactionController.addExpenses.length}');
+                    transactionController.addExpense(
+                      title: transactionController.title.toString(), 
+                      amount: double.tryParse(expression) ?? 0, 
+                      date: DateTime.now().toIso8601String(), 
+                      iconCode:transactionController.iconCode.value,
+                      accountId: transactionController.accountId.value, 
+                      categoryId: transactionController.categoryId.value
+                      );
+                    accountController.updateAccountBalance(transactionController.accountId.value, double.tryParse(expression) ?? 0);
+                    categoryController.updateCategoryExpenses(id: transactionController.categoryId.value, expenses: double.tryParse(expression) ?? 0);
+                    accountController.selectContainer.value = '';
+                    categoryController.selectCategory.value = '';
+                    expression = '0';
+                    Get.back();
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width,
@@ -328,7 +334,7 @@ Widget accountList(AccountController accountController , TransactionController t
           return GestureDetector(
             onTap: () {
               accountController.selectContainer.value = account['name'];
-              transactionController.accountName.value = account['name'];
+              transactionController.accountId.value = account['id'] as int;
             },
             child: Container(
               height: 25,
@@ -399,11 +405,10 @@ Widget accountList(AccountController accountController , TransactionController t
         final Color categoryColor = Color(colorValue);
           return GestureDetector(
             onTap:(){
-                log('$expression');
+                log(' express on == $expression');
                 categoryController.selectCategory.value = category['name'];
-                transactionController.categoryName.value = category['name'];
-                transactionController.expenses.value = expression;
-                transactionController.icon.value = category['icon'];
+                transactionController.categoryId.value = category['id'] as int;
+                transactionController.iconCode.value = iconCode;
             },
             child: Container(
               height: 25,
