@@ -77,7 +77,7 @@ class _AccountPage extends State<AccountPage> {
         final account = controller.accountList.firstWhere((item) => item['id'] == id);
          _accountNameController.text = account['name'];
          _accountBalanceController.text = account['balance'].toString();
-         containerIcon = IconData(account['iconCode'],fontFamily:'MaterialIcons');
+         containerIcon =  IconData(account['iconCode'],fontFamily:'MaterialIcons');
       }else {
         _accountNameController.text = '';
         _accountBalanceController.text = '';

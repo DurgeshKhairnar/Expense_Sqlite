@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:counter/dataBaseHelper.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +11,11 @@ class CategoryController extends GetxController{
 
 List<MaterialColor> lightColors = [
   Colors.red,
-  Colors.pink,
   Colors.purple,
   Colors.deepPurple,
   Colors.indigo,
   Colors.blue,
+    Colors.pink,
 ].obs;
 
   @override
@@ -26,16 +25,20 @@ List<MaterialColor> lightColors = [
   }
 
   Future<void> loadData() async{
-    // 1. Fetch from database into a local variable with a distinct name
-    final fetchedData = await DatabaseHelper.instance.getCategories();
-    
-    log('${fetchedData.length}');
 
-    // 2. Convert sqflite's read-only result into a mutable list
+    final fetchedData = await DatabaseHelper.instance.getCategories();
+
     final mutableList = fetchedData.map((e) => Map<String, dynamic>.from(e)).toList();
 
-    // 3. Assign the mutable list to your controller's reactive categoryList
-    categoryList.assignAll(mutableList);
+    var sortCategories = List<Map<String,dynamic>>.from(mutableList);
+
+    sortCategories.sort((a,b){
+        double aData = a['expense'] ?? 0.0;
+        double bData = b['expense'] ?? 0.0;
+        return bData.compareTo(aData);
+    });
+
+    categoryList.assignAll(sortCategories);
   }
 
   Future<void> updateCategoryExpenses({required int id , required double expenses})async{

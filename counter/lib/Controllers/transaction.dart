@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 class TransactionController extends GetxController {
   List<Map<String, dynamic>> addExpensesList = <Map<String, dynamic>>[].obs;
+  var selectedYearMonth = DateFormat('yyyy-MM').format(DateTime.now()).obs;
 
   List<MaterialColor> lightColors = [
     Colors.red,
@@ -32,8 +33,18 @@ class TransactionController extends GetxController {
 
   Future<void> loadData() async {
     final expenseList = await DatabaseHelper.instance.getExpenses();
-    log('expenseList == $expenseList');
     addExpensesList.assignAll(expenseList);
+
+    // Optional: If you want it to jump to the latest expense month automatically:
+    if (addExpensesList.isNotEmpty) {
+      DateTime latestDate = addExpensesList
+          .map((e) {
+            return DateTime.tryParse(e['date'] ?? '') ?? DateTime(1970);
+          })
+          .reduce((a, b) => a.isAfter(b) ? a : b);
+
+      selectedYearMonth.value = DateFormat('yyyy-MM').format(latestDate);
+    }
   }
 
   Future<void> addExpense({
@@ -100,12 +111,11 @@ class TransactionController extends GetxController {
       } else {
         headerKey = DateFormat('dd MMM yyyy').format(itemDay);
       }
-
       if (!grouped.containsKey(headerKey)) {
         grouped[headerKey] = [];
-      } else {
-        grouped[headerKey]!.add(item);
       }
+
+      grouped[headerKey]!.add(item);
     }
 
     grouped.removeWhere((key, value) => value.isEmpty);
@@ -114,21 +124,21 @@ class TransactionController extends GetxController {
   }
 
   // Inside your TransactionController class:
-double get totalMonthExpense {
-  double total = 0.0;
+  double get totalMonthExpense {
+    double total = 0.0;
 
-  // Loop through all date groups in the current month
-  groupedTransactions.forEach((dateHeader, items) {
-    for (var item in items) {
-      // Safely parse amount as double
-      final double amount = (item['amount'] is num) 
-          ? (item['amount'] as num).toDouble() 
-          : double.tryParse(item['amount'].toString()) ?? 0.0;
-          
-      total += amount;
-    }
-  });
+    // Loop through all date groups in the current month
+    groupedTransactions.forEach((dateHeader, items) {
+      for (var item in items) {
+        // Safely parse amount as double
+        final double amount = (item['amount'] is num)
+            ? (item['amount'] as num).toDouble()
+            : double.tryParse(item['amount'].toString()) ?? 0.0;
 
-  return total;
-}
+        total += amount;
+      }
+    });
+
+    return total;
+  }
 }

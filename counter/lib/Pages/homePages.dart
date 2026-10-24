@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:counter/Controllers/accountController.dart';
+import 'package:counter/Controllers/transaction.dart';
 import 'package:counter/Widget/expensesCategoryChart.dart';
 import 'package:counter/Widget/sectionHeders.dart';
 import 'package:counter/dataBaseHelper.dart';
@@ -45,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final AccountController controller = Get.put(AccountController());
+    final TransactionController transactionController = Get.find<TransactionController>();
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 249, 249, 249),
       body: SafeArea(
@@ -55,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               _heders(),
               const SizedBox(height: 10),
-              _totalExpensesContainer(),
+              _totalExpensesContainer(transactionController),
               const SizedBox(height: 10),
               SectionHeader(
                 title: 'Accounts',
@@ -93,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _totalExpensesContainer() {
+  Widget _totalExpensesContainer(TransactionController transactionController) {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 100,
@@ -124,14 +126,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     SizedBox(height: 4), // Spacing between texts
-                    Text(
-                      '₹$balance',
+                   Obx(() =>  Text(
+                      '₹${transactionController.totalMonthExpense.toStringAsFixed(2)}',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    ),)
                   ],
                 ),
 
@@ -169,6 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _accountList(AccountController controller) {
      final limitedList = controller.accountList.take(3).toList();
     return Flexible(
+      flex :1,
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -177,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
           final iconData = IconData(limitedList[index]['iconCode'],fontFamily: 'MaterialIcons');
           return Container(
             width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(color: Colors.white),
             child: ListTile(
               leading: CircleAvatar(

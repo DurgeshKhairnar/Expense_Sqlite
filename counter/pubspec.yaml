@@ -42,6 +42,7 @@ dependencies:
   math_expressions: ^3.2.0
   flutter_slidable: ^4.0.3
   intl: ^0.20.3
+  syncfusion_flutter_charts: ^35.1.41
 
 dev_dependencies:
   flutter_test:

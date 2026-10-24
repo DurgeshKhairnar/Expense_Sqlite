@@ -51,7 +51,7 @@ List<MaterialColor> lightColors = [
 
     Future<void> updateAccountBalance(int id , double expense)async{
       final account = accountList.firstWhere((account) => account['id'] == id);
-      if(expense < account['balance']){
+      if(expense <= account['balance']){
         double newbalance = (account['balance'] - expense);
         await DatabaseHelper.instance.updateAccountBalance(id, newbalance);
       }
