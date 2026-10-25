@@ -149,8 +149,10 @@ class _CalculateState extends State<Calculate> {
   @override
   Widget build(BuildContext context) {
     final AccountController accountController = Get.find<AccountController>();
-    final CategoryController categoryController = Get.find<CategoryController>();
-    final TransactionController transactionController = Get.find<TransactionController>();
+    final CategoryController categoryController =
+        Get.find<CategoryController>();
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -166,7 +168,7 @@ class _CalculateState extends State<Calculate> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
-                accountList(accountController , transactionController),
+                accountList(accountController, transactionController),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -174,7 +176,7 @@ class _CalculateState extends State<Calculate> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
-                categoryList(categoryController , transactionController),
+                categoryList(categoryController, transactionController),
                 const SizedBox(height: 3),
                 Container(
                   width: MediaQuery.of(context).size.width,
@@ -269,21 +271,12 @@ class _CalculateState extends State<Calculate> {
                   ),
                 ),
                 GestureDetector(
-                  onTap:(){
-                    transactionController.addExpense(
-                      title: transactionController.title.toString(), 
-                      amount: double.tryParse(expression) ?? 0, 
-                      date: DateTime.now().toIso8601String(), 
-                      iconCode:transactionController.iconCode.value,
-                      accountId: transactionController.accountId.value, 
-                      categoryId: transactionController.categoryId.value
-                      );
-                    accountController.updateAccountBalance(transactionController.accountId.value, double.tryParse(expression) ?? 0);
-                    categoryController.updateCategoryExpenses(id: transactionController.categoryId.value, expenses: double.tryParse(expression) ?? 0);
-                    accountController.selectContainer.value = '';
-                    categoryController.selectCategory.value = '';
-                    expression = '0';
-                    Get.back();
+                  onTap: () {
+                    _addExpensesMethod(
+                      transactionController,
+                      accountController,
+                      categoryController,
+                    );
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width,
@@ -310,136 +303,172 @@ class _CalculateState extends State<Calculate> {
     );
   }
 
- 
-Widget accountList(AccountController accountController , TransactionController transactionController) {
-  return SizedBox(
-    height: 90,
-    child: Obx(() {
-      final selectedName = accountController.selectContainer.value;
-      final totalAccounts = accountController.accountList.length;
+  void _addExpensesMethod(
+    TransactionController transactionController,
+    AccountController accountController,
+    CategoryController categoryController,
+  ) {
+    transactionController.addExpense(
+      title: transactionController.title.toString(),
+      amount: double.tryParse(expression) ?? 0,
+      date: DateTime.now().toIso8601String(),
+      iconCode: transactionController.iconCode.value,
+      accountId: transactionController.accountId.value,
+      categoryId: transactionController.categoryId.value,
+    );
+    accountController.updateAccountBalance(
+      transactionController.accountId.value,
+      double.tryParse(expression) ?? 0,
+      categoryController.selectCategory.value
+    );
+    categoryController.updateCategoryExpenses(
+      id: transactionController.categoryId.value,
+      expenses: double.tryParse(expression) ?? 0,
+    );
+    accountController.selectContainer.value = '';
+    categoryController.selectCategory.value = '';
+    expression = '0';
+    Get.back();
+  }
 
-      return ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: totalAccounts,
-        itemBuilder: (context, index) {
-   
-          final account = accountController.accountList[index];
-          final isSelected = selectedName == account['name'];
-          final icon = IconData(account['iconCode'],fontFamily: 'MaterialIcons');
-
-          final borderColor = isSelected
-              ? Colors.blue
-              : Colors.grey.shade300;
-
-          return GestureDetector(
-            onTap: () {
-              accountController.selectContainer.value = account['name'];
-              transactionController.accountId.value = account['id'] as int;
-            },
-            child: Container(
-              height: 25,
-              margin: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                  color: borderColor,
-                  width: isSelected ? 2 : 1,
-                ),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 3,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      icon,
-                      color: Colors.red[800],
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      account['name'].toString(),
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '₹${account["balance"]}',
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    }),
-  );
-}
-
-  Widget categoryList(CategoryController categoryController, TransactionController transactionController) {
-      return SizedBox(
+  Widget accountList(
+    AccountController accountController,
+    TransactionController transactionController,
+  ) {
+    return SizedBox(
       height: 90,
-      child: Obx(() { 
-        final categoryList =  categoryController.categoryList;
+      child: Obx(() {
+        final selectedName = accountController.selectContainer.value;
+        final totalAccounts = accountController.accountList.length;
+
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: totalAccounts,
+          itemBuilder: (context, index) {
+            final account = accountController.accountList[index];
+            final isSelected = selectedName == account['name'];
+            final icon = IconData(
+              account['iconCode'],
+              fontFamily: 'MaterialIcons',
+            );
+
+            final borderColor = isSelected ? Colors.blue : Colors.grey.shade300;
+
+            return GestureDetector(
+              onTap: () {
+                accountController.selectContainer.value = account['name'];
+                transactionController.accountId.value = account['id'] as int;
+              },
+              child: Container(
+                height: 25,
+                margin: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: borderColor,
+                    width: isSelected ? 2 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 3,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icon, color: Colors.red[800]),
+                      const SizedBox(height: 3),
+                      Text(
+                        account['name'].toString(),
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '₹${account["balance"]}',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }
+
+  Widget categoryList(
+    CategoryController categoryController,
+    TransactionController transactionController,
+  ) {
+    return SizedBox(
+      height: 90,
+      child: Obx(() {
+        final categoryList = categoryController.categoryList;
         final selectName = categoryController.selectCategory.value;
         return ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categoryList.length,
-        itemBuilder: (context, index) {
-          final category = categoryList[index];
-          final isSelected = (selectName == category['name']);
-          final borderColor = isSelected
-              ? Colors.blue
-              : Colors.grey.shade300;
-          final int iconCode = category['iconCode'] ?? Icons.category.codePoint;
-        final iconData = IconData(iconCode, fontFamily: 'MaterialIcons');
-        final int colorValue = category['color'] ?? Colors.blue.value;
-        final Color categoryColor = Color(colorValue);
-          return GestureDetector(
-            onTap:(){
+          scrollDirection: Axis.horizontal,
+          itemCount: categoryList.length,
+          itemBuilder: (context, index) {
+            final category = categoryList[index];
+            final isSelected = (selectName == category['name']);
+            final borderColor = isSelected ? Colors.blue : Colors.grey.shade300;
+            final int iconCode =
+                category['iconCode'] ?? Icons.category.codePoint;
+            final iconData = IconData(iconCode, fontFamily: 'MaterialIcons');
+            final int colorValue = category['color'] ?? Colors.blue.value;
+            final Color categoryColor = Color(colorValue);
+            return GestureDetector(
+              onTap: () {
                 log(' express on == $expression');
                 categoryController.selectCategory.value = category['name'];
                 transactionController.categoryId.value = category['id'] as int;
                 transactionController.iconCode.value = iconCode;
-            },
-            child: Container(
-              height: 25,
-              margin: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: borderColor,width:isSelected ? 2 : 1),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(iconData, color: categoryColor),
-                    const SizedBox(height: 3),
-                    Text(
-                      category['name'],
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+              },
+              child: Container(
+                height: 25,
+                margin: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: borderColor,
+                    width: isSelected ? 2 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 3,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(iconData, color: categoryColor),
+                      const SizedBox(height: 3),
+                      Text(
+                        category['name'],
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
-      ); }) 
+            );
+          },
+        );
+      }),
     );
   }
 }

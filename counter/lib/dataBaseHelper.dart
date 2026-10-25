@@ -139,6 +139,13 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'type': 'Expense',
           'expense': 0.0,
         },
+          {
+          'name': 'Salary',
+          'iconCode': Icons.account_balance_wallet.codePoint,
+          'color': Colors.green.value,
+          'type': 'Income',
+          'expense': 0.0,
+        },
         {
           'name': 'Food & Dining',
           'iconCode': Icons.restaurant.codePoint,
@@ -172,13 +179,6 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'iconCode': Icons.movie.codePoint,
           'color': Colors.deepPurple.value,
           'type': 'Expense',
-          'expense': 0.0,
-        },
-        {
-          'name': 'Salary',
-          'iconCode': Icons.account_balance_wallet.codePoint,
-          'color': Colors.green.value,
-          'type': 'Income',
           'expense': 0.0,
         },
         {

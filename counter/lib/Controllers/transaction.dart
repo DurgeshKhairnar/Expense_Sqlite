@@ -9,6 +9,8 @@ class TransactionController extends GetxController {
   List<Map<String, dynamic>> addExpensesList = <Map<String, dynamic>>[].obs;
   var selectedYearMonth = DateFormat('yyyy-MM').format(DateTime.now()).obs;
 
+   RxString transactionString = 'All'.obs;
+
   List<MaterialColor> lightColors = [
     Colors.red,
     Colors.purple,
@@ -78,11 +80,27 @@ class TransactionController extends GetxController {
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
 
-    log('now = $now');
-    log('today = $today');
-    log('yesterday = $yesterday');
+   
 
-    var sortList = List<Map<String, dynamic>>.from(addExpensesList);
+  List<Map<String, dynamic>>  filteredTransactions  = addExpensesList.where((transaction) {
+      if (transactionString.value == 'All') {
+       return true;
+    }
+    final categoryName =
+        transaction['categoryName']?.toString() ?? '';
+
+    if (transactionString.value == 'Income') {
+      return categoryName == 'Salary';
+    }
+
+    if (transactionString.value == 'Expenses') {
+      return categoryName != 'Salary';
+    }
+
+    return true;
+  }).toList();
+
+    var sortList = List<Map<String, dynamic>>.from(filteredTransactions);
 
     sortList.sort((a, b) {
       DateTime dateA = DateTime.tryParse(a['date'] ?? '') ?? DateTime(1970);

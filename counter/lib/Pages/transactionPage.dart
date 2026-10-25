@@ -13,7 +13,7 @@ class Transaction extends StatefulWidget {
 }
 
 class _Transaction extends State<Transaction> {
-  String transactionString = 'All';
+
   @override
   Widget build(BuildContext context) {
     final TransactionController transactionController =
@@ -34,7 +34,7 @@ class _Transaction extends State<Transaction> {
                 ),
               ),
               const SizedBox(height: 10),
-              transactionHeders(),
+              transactionHeders(transactionController),
               const SizedBox(height: 10),
               Flexible(
   child: Obx(() {
@@ -73,9 +73,11 @@ class _Transaction extends State<Transaction> {
                       expense['iconCode'] ?? 58778,
                       fontFamily: 'MaterialIcons',
                     );
-                    
+                    final expenseColor = (expense['categoryName'] == 'Salary') ? {'color':Colors.green, 'amount':expense['amount'] , 'sign': '+' } : {'color':Colors.red, 'amount':expense['amount'] , 'sign': '-' };
                     final rawDate = expense['date'] ?? '';
+
                     String date = '';
+
                     if (rawDate.isNotEmpty) {
                       DateTime parseDate = DateTime.parse(rawDate);
                       date = DateFormat('MMM d, yyyy').format(parseDate);
@@ -151,11 +153,11 @@ class _Transaction extends State<Transaction> {
                             ),
                           ),
                           trailing: Text(
-                            '- ₹${expense["amount"]}',
-                            style: const TextStyle(
+                            '${expenseColor["sign"]} ₹${expenseColor["amount"]}',
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                              color: Colors.red,
+                              color: expenseColor['color'],
                             ),
                           ),
                         ),
@@ -176,7 +178,7 @@ class _Transaction extends State<Transaction> {
     );
   }
 
-  Widget transactionHeders() {
+  Widget transactionHeders( TransactionController transactionController) {
     return Container(
       height: 50,
       decoration: BoxDecoration(
@@ -185,14 +187,14 @@ class _Transaction extends State<Transaction> {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: ['All', 'Income', 'Expense'].map((title) {
-          Color color = (transactionString == title)
+        children: ['All', 'Income', 'Expenses'].map((title) {
+          Color color = (transactionController.transactionString.value == title)
               ? Colors.deepPurpleAccent
               : Colors.white;
           return GestureDetector(
             onTap: () {
               setState(() {
-                transactionString = title;
+               transactionController.transactionString.value = title;
               });
             },
             child: Container(
@@ -205,7 +207,7 @@ class _Transaction extends State<Transaction> {
                 title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: (transactionString == title)
+                  color: (transactionController.transactionString == title)
                       ? Colors.white
                       : Colors.black,
                 ),

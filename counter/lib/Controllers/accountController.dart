@@ -49,11 +49,14 @@ List<MaterialColor> lightColors = [
          await DatabaseHelper.instance.updateAccount(account);
     }  
 
-    Future<void> updateAccountBalance(int id , double expense)async{
+    Future<void> updateAccountBalance(int id , double expense , String categoryName)async{
       final account = accountList.firstWhere((account) => account['id'] == id);
-      if(expense <= account['balance']){
+      if(expense <= account['balance'] && categoryName != 'Salary'){
         double newbalance = (account['balance'] - expense);
         await DatabaseHelper.instance.updateAccountBalance(id, newbalance);
+      }else{
+          double newbalance = (account['balance'] + expense);
+         await DatabaseHelper.instance.updateAccountBalance(id, newbalance);
       }
       await loadData();
     }
