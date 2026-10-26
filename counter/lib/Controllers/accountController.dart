@@ -33,6 +33,11 @@ List<MaterialColor> lightColors = [
     accountList.assignAll(myAccount);
   }
 
+  Future<void> insertDbAccount(int id)async{
+    await DatabaseHelper.instance.insertDB(id);
+    await loadData();
+  }
+
   Future<void> addAccount(String name, String balance , int iconCode) async{
       await DatabaseHelper.instance.insertAccount({
           'name':name,

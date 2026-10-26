@@ -20,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
 
 
   final List<Widget> _screens = [
-    const MyHomePage(),         
+    const MyHomePage(),      
     const Transaction(),    
     const BudgetPage(),        
     const ProfilePage(),       

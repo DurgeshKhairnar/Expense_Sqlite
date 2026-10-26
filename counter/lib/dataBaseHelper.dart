@@ -26,59 +26,101 @@ class DatabaseHelper {
   }
 
   Future<void> _createDB(Database db, int version) async {
-    // await db.execute('DROP TABLE IF EXISTS expenses');
-    // await db.execute('DROP TABLE IF EXISTS categories');
-    // await db.execute('DROP TABLE IF EXISTS account');
 
     await db.execute('''
-          CREATE TABLE account (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL , 
-            balance REAL NOT NULL ,
-            iconCode INTEGER NOT NULL
-          )
-        ''');
+    CREATE TABLE users (
+      userId INTEGER PRIMARY KEY AUTOINCREMENT,
+      userName TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL
+    )
+  ''');
 
-    await db.execute('''
-      CREATE TABLE categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        iconCode INTEGER NOT NULL,
-        color INTEGER NOT NULL,
-        type TEXT NOT NULL,
-        expense REAL NOT NULL
-      )
-    ''');
+  await db.execute('''
+    CREATE TABLE account (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL, 
+      balance REAL NOT NULL,
+      iconCode INTEGER NOT NULL,
+      userId INTEGER NOT NULL,
+      FOREIGN KEY (userId) REFERENCES users(userId)
+    )
+  ''');
 
-    await db.execute('''
-          CREATE TABLE expenses (
-              id INTEGER PRIMARY KEY AUTOINCREMENT ,
-              title TEXT NOT NULL,
-              amount REAL NOT NULL,
-              date TEXT NOT NULL,
-              iconCode INTEGER NOT NULL,
-              accountId INTEGER,
-              categoryId INTEGER,
-              FOREIGN KEY (accountId) REFERENCES account(id),
-              FOREIGN KEY (categoryId) REFERENCES categories(id)
-          )
-      ''');
+  await db.execute('''
+    CREATE TABLE categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      iconCode INTEGER NOT NULL,
+      color INTEGER NOT NULL,
+      type TEXT NOT NULL,
+      expense REAL NOT NULL,
+      userId INTEGER NOT NULL,
+      FOREIGN KEY (userId) REFERENCES users(userId)
+    )
+  ''');
 
-    await insertDB(db);
-    await insertCategories(db);
+  await db.execute('''
+    CREATE TABLE expenses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      amount REAL NOT NULL,
+      date TEXT NOT NULL,
+      iconCode INTEGER NOT NULL,
+      accountId INTEGER,
+      categoryId INTEGER,
+      userId INTEGER NOT NULL,
+      FOREIGN KEY (userId) REFERENCES users(userId),
+      FOREIGN KEY (accountId) REFERENCES account(id),
+      FOREIGN KEY (categoryId) REFERENCES categories(id)
+    )
+  ''');
+
+
+    //  await insertDB(db);
+    // await insertCategories(db);
   }
 
-  Future<void> insertDB(Database db) async {
+  Future<int> insertUser(String userName, String password) async {
+  final db = await database; 
+  
+  return await db.insert(
+    'users', 
+    {
+      'userName': userName, 
+      'password': password,
+    },
+  );
+}
+
+Future<Map<String, dynamic>?> checkLogin(String userName, String password) async {
+  final db = await database;
+
+  final List<Map<String, dynamic>> results = await db.query(
+    'users',
+    where: 'userName = ? AND password = ?',
+    whereArgs: [userName, password],
+  );
+
+  if (results.isNotEmpty) {
+    return results.first;
+  }
+
+  return null;
+}
+  Future<void> insertDB(int id) async {
+    final db = await database;
     final List<Map<String, dynamic>> accountsList = [
       {
         'name': 'Bank of India',
         'balance': 25000.0,
         'iconCode': Icons.account_balance.codePoint,
+        'userId':id
       },
       {
         'name': 'Paytm Wallet',
         'balance': 1200.0,
         'iconCode': Icons.wallet.codePoint,
+        'userId':id
       },
     ];
     Batch batch = db.batch();
@@ -129,7 +171,8 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
 
 ////////////////////////////// categories
 
-  Future<void> insertCategories(Database db) async {
+  Future<void> insertCategories(int id) async {
+        final db = await database;
     try {
       final List<Map<String, dynamic>> categoryList = [
         {
@@ -138,6 +181,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.pink.value,
           'type': 'Expense',
           'expense': 0.0,
+          'userId':id
         },
           {
           'name': 'Salary',
@@ -145,6 +189,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.green.value,
           'type': 'Income',
           'expense': 0.0,
+          'userId':id
         },
         {
           'name': 'Food & Dining',
@@ -152,6 +197,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.orange.value,
           'type': 'Expense',
           'expense': 0.0,
+          'userId':id
         },
         {
           'name': 'Transport',
@@ -159,6 +205,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.blue.value,
           'type': 'Expense',
           'expense': 0.0,
+          'userId':id
         },
         {
           'name': 'Bills',
@@ -166,6 +213,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.red.value,
           'type': 'Expense',
           'expense': 0.0,
+          'userId':id
         },
         {
           'name': 'Mobile Recharge',
@@ -173,6 +221,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.purple.value,
           'type': 'Expense',
           'expense': 0.0,
+          'userId':id
         },
         {
           'name': 'Entertainment',
@@ -180,6 +229,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.deepPurple.value,
           'type': 'Expense',
           'expense': 0.0,
+          'userId':id
         },
         {
           'name': 'Grocery Store',
@@ -187,6 +237,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.teal.value,
           'type': 'Expense',
           'expense': 0.0,
+          'userId':id
         },
         {
           'name': 'Tea & Coffee',
@@ -194,6 +245,7 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
           'color': Colors.brown.value,
           'type': 'Expense',
           'expense': 0.0,
+          'userId':id
         },
       ];
 

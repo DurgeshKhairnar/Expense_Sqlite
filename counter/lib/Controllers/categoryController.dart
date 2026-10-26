@@ -43,8 +43,12 @@ List<MaterialColor> lightColors = [
 
   Future<void> updateCategoryExpenses({required int id , required double expenses})async{
       await DatabaseHelper.instance.updateCategoryExpense(id, expenses);
-        loadData();
+       await loadData();
   }
 
+  Future<void> insertCategories(int id)async{
+     await DatabaseHelper.instance.insertCategories(id);
+     await loadData();
+  }
 
 }

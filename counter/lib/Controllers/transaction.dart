@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:counter/dataBaseHelper.dart';
 import 'package:flutter/material.dart';
