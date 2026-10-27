@@ -2,6 +2,7 @@
 import 'package:counter/dataBaseHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 
 class TransactionController extends GetxController {
@@ -9,6 +10,8 @@ class TransactionController extends GetxController {
   var selectedYearMonth = DateFormat('yyyy-MM').format(DateTime.now()).obs;
 
    RxString transactionString = 'All'.obs;
+
+    final box = GetStorage();
 
   List<MaterialColor> lightColors = [
     Colors.red,
@@ -29,11 +32,10 @@ class TransactionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadData();
   }
 
-  Future<void> loadData() async {
-    final expenseList = await DatabaseHelper.instance.getExpenses();
+  Future<void> loadData(int id) async {
+    final expenseList = await DatabaseHelper.instance.getExpenses(id);
     addExpensesList.assignAll(expenseList);
 
     // Optional: If you want it to jump to the latest expense month automatically:
@@ -55,6 +57,7 @@ class TransactionController extends GetxController {
     required int iconCode,
     required int accountId,
     required int categoryId,
+    required int userId
   }) async {
     await DatabaseHelper.instance.insertExpenses({
       'title': title,
@@ -63,13 +66,13 @@ class TransactionController extends GetxController {
       'iconCode': iconCode,
       'accountId': accountId,
       'categoryId': categoryId,
+      'userId':userId
     });
-    await loadData();
+    await loadData(userId);
   }
 
   Future<void> deleteExpense(int id) async {
     await DatabaseHelper.instance.deleteExpense(id);
-    await loadData();
   }
 
   Map<String, List<Map<String, dynamic>>> get groupedTransactions {

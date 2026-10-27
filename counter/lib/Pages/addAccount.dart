@@ -4,6 +4,7 @@ import 'package:counter/Controllers/accountController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -13,6 +14,7 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPage extends State<AccountPage> {
+  final box = GetStorage();
   final TextEditingController _accountNameController = TextEditingController();
   final TextEditingController _accountBalanceController =
       TextEditingController();
@@ -158,12 +160,15 @@ class _AccountPage extends State<AccountPage> {
               ),
               ElevatedButton(
                 onPressed: () {
+                  int? userId = box.read('userId');
+                  log('userId = $userId');
                     if(id != null){
                         controller.updateAccount({
                           'id': id,
                           'name': _accountNameController.text.trim(),
                           'balance':_accountBalanceController.text.trim(),
-                          'iconCode': containerIcon!.codePoint
+                          'iconCode': containerIcon!.codePoint,
+                          'userId': userId 
                         });
                     }else{
                         if (_accountNameController.text != '' &&
@@ -172,10 +177,10 @@ class _AccountPage extends State<AccountPage> {
                     controller.addAccount(
                       _accountNameController.text.trim(),
                       _accountBalanceController.text.trim(),
-                        containerIcon!.codePoint);
+                        containerIcon!.codePoint ,  userId!);
                       }
                     }
-                    controller.loadData();
+                    controller.loadData(userId!);
                     _accountNameController.clear();
                     _accountBalanceController.clear();
                     containerIcon = null;
@@ -195,7 +200,6 @@ class _AccountPage extends State<AccountPage> {
   }
 
   Widget _addAccountList(AccountController controller) {
-    log('${controller.accountList.length}');
     return Flexible(
       child: ListView.builder(
         itemCount: controller.accountList.length,
@@ -224,8 +228,9 @@ class _AccountPage extends State<AccountPage> {
                   ),
                   SlidableAction(
                     onPressed: (context) {
+                        final userId = box.read('userId');
                         controller.deleteAccount(account['id']);
-                        controller.loadData();
+                        controller.loadData(userId);
                     },
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,

@@ -7,5 +7,6 @@ abstract class Routes {
   static const calculatorScreen = '/calculator';
   static const loginScreen = '/loginScreen';
   static const signupScreen = '/signupScreen';
+  static const forgetPasswordScreen = '/forgetPasswordScreen';
 }
 

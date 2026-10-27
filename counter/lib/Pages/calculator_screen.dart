@@ -5,6 +5,7 @@ import 'package:counter/Controllers/categoryController.dart';
 import 'package:counter/Controllers/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:math_expressions/math_expressions.dart';
 
 class Calculate extends StatefulWidget {
@@ -15,6 +16,7 @@ class Calculate extends StatefulWidget {
 }
 
 class _CalculateState extends State<Calculate> {
+  final box = GetStorage();
   String expression = '';
 
   final TextEditingController note = TextEditingController();
@@ -308,27 +310,33 @@ class _CalculateState extends State<Calculate> {
     AccountController accountController,
     CategoryController categoryController,
   ) {
+     int? userId = box.read('userId');
     transactionController.addExpense(
       title: transactionController.title.toString(),
       amount: double.tryParse(expression) ?? 0,
       date: DateTime.now().toIso8601String(),
       iconCode: transactionController.iconCode.value,
       accountId: transactionController.accountId.value,
-      categoryId: transactionController.categoryId.value,
+      categoryId: transactionController.categoryId.value, userId: userId!,
     );
     accountController.updateAccountBalance(
       transactionController.accountId.value,
       double.tryParse(expression) ?? 0,
-      categoryController.selectCategory.value
+      categoryController.selectCategory.value,
+      userId
     );
     categoryController.updateCategoryExpenses(
       id: transactionController.categoryId.value,
       expenses: double.tryParse(expression) ?? 0,
+      userId : userId
     );
     accountController.selectContainer.value = '';
     categoryController.selectCategory.value = '';
     expression = '0';
-    Get.back();
+    transactionController.loadData(userId);
+    categoryController.loadData(userId);
+    accountController.loadData(userId);
+     Get.back();
   }
 
   Widget accountList(

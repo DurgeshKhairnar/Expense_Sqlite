@@ -107,20 +107,20 @@ Future<Map<String, dynamic>?> checkLogin(String userName, String password) async
 
   return null;
 }
-  Future<void> insertDB(int id) async {
+  Future<void> insertDB(int userId) async {
     final db = await database;
     final List<Map<String, dynamic>> accountsList = [
       {
         'name': 'Bank of India',
         'balance': 25000.0,
         'iconCode': Icons.account_balance.codePoint,
-        'userId':id
+        'userId':userId
       },
       {
         'name': 'Paytm Wallet',
         'balance': 1200.0,
         'iconCode': Icons.wallet.codePoint,
-        'userId':id
+        'userId':userId
       },
     ];
     Batch batch = db.batch();
@@ -132,9 +132,12 @@ Future<Map<String, dynamic>?> checkLogin(String userName, String password) async
     await batch.commit(noResult: true);
   }
 
-  Future<List<Map<String, dynamic>>> getAccounts() async {
+  Future<List<Map<String, dynamic>>> getAccounts(int userId) async {
     final db = await database;
-    return db.query('account');
+    return db.query('account',
+    where:'userId = ?',
+    whereArgs:[userId]
+    );
   }
 
   Future<void> insertAccount(Map<String,dynamic> account) async{
@@ -160,12 +163,12 @@ Future<Map<String, dynamic>?> checkLogin(String userName, String password) async
     );
   }   
 
-Future<void> updateAccountBalance(int id, double newBalance)async{
+Future<void> updateAccountBalance(int id, double newBalance , int userId)async{
   final db = await database;
   await db.update('account',
   {'balance' : newBalance},
-  where : 'id = ?',
-  whereArgs: [id],
+  where : 'id = ? AND userId = ?',
+  whereArgs: [id,userId],
   );
 }
 
@@ -262,18 +265,22 @@ Future<void> updateAccountBalance(int id, double newBalance)async{
     }
   }
 
-  Future<List<Map<String, dynamic>>> getCategories() async {
+  Future<List<Map<String, dynamic>>> getCategories(int userId) async {
     final db = await database;
-    return db.query('categories');
+    return db.query(
+      'categories',
+      where: 'userId = ?',
+      whereArgs: [userId]
+    );
   }
 
-  Future<void> updateCategoryExpense(int id ,double expenses) async{
+  Future<void> updateCategoryExpense(int id ,double expenses , int userId) async{
   final db = await database;
    await db.update(
       'categories',
       {'expense': expenses},
-      where : 'id = ?',
-      whereArgs:[id]
+      where : 'id = ? AND userId = ?',
+      whereArgs:[id,userId]
     );
  }
 
@@ -284,16 +291,16 @@ Future<void> insertExpenses(Map<String,dynamic> expenses)async{
   db.insert('expenses',expenses);
 }
 
-  Future<List<Map<String, dynamic>>> getExpenses() async {
+  Future<List<Map<String, dynamic>>> getExpenses(int userId) async {
+    log('get expense id $userId');
     final db = await database;
     return await db.rawQuery('''
-      SELECT expenses.*, 
-             account.name AS accountName, 
-             categories.name AS categoryName 
-      FROM expenses
-      LEFT JOIN account ON expenses.accountId = account.id
-      LEFT JOIN categories ON expenses.categoryId = categories.id
-    ''');
+    SELECT e.*, c.name as categoryName, a.name as accountName 
+    FROM expenses e
+    LEFT JOIN categories c ON e.categoryId = c.id
+    LEFT JOIN account a ON e.accountId = a.id
+    WHERE e.userId = ?
+  ''', [userId]);
   }
 
   Future<void> deleteExpense(int id)async{

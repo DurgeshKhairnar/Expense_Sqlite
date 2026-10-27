@@ -43,6 +43,7 @@ dependencies:
   flutter_slidable: ^4.0.3
   intl: ^0.20.3
   syncfusion_flutter_charts: ^35.1.41
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

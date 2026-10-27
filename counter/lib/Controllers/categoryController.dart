@@ -2,10 +2,13 @@
 import 'package:counter/dataBaseHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class CategoryController extends GetxController{
 
-    final List<Map<String, dynamic>> categoryList = <Map<String, dynamic>>[].obs;
+  final box = GetStorage();
+
+  final List<Map<String, dynamic>> categoryList = <Map<String, dynamic>>[].obs;
 
   var selectCategory = ''.obs;
 
@@ -21,12 +24,11 @@ List<MaterialColor> lightColors = [
   @override
   void onInit(){
     super.onInit();
-    loadData();
   }
 
-  Future<void> loadData() async{
+  Future<void> loadData(int userId) async{
 
-    final fetchedData = await DatabaseHelper.instance.getCategories();
+    final fetchedData = await DatabaseHelper.instance.getCategories(userId);
 
     final mutableList = fetchedData.map((e) => Map<String, dynamic>.from(e)).toList();
 
@@ -41,14 +43,16 @@ List<MaterialColor> lightColors = [
     categoryList.assignAll(sortCategories);
   }
 
-  Future<void> updateCategoryExpenses({required int id , required double expenses})async{
-      await DatabaseHelper.instance.updateCategoryExpense(id, expenses);
-       await loadData();
+  
+
+  Future<void> updateCategoryExpenses({required int id , required double expenses , required int userId})async{
+      await DatabaseHelper.instance.updateCategoryExpense(id, expenses , userId);
+      //  await loadData();
   }
 
   Future<void> insertCategories(int id)async{
      await DatabaseHelper.instance.insertCategories(id);
-     await loadData();
+    //  await loadData();
   }
 
 }

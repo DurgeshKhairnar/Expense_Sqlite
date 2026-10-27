@@ -5,6 +5,13 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 class AuthController extends GetxController {
 
   RxInt userId = 0.obs;
+
+  var isHidden = true.obs;
+
+
+  void togglePasswordVisibility() {
+    isHidden.value = !isHidden.value;
+  }
   
   Future<int> signupUser({
     required String userName,
@@ -22,4 +29,11 @@ class AuthController extends GetxController {
     return user;
   }
 
+  Future<int> updatePassword({
+  required String userName,
+  required String newPassword,
+})async{
+    final id = await DatabaseHelper.instance.updateUserPassword(userName: userName, newPassword: newPassword);
+    return id;
+  }
 }

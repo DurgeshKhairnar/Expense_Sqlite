@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:counter/Controllers/accountController.dart';
+import 'package:counter/Controllers/categoryController.dart';
 import 'package:counter/Controllers/transaction.dart';
 import 'package:counter/Widget/expensesCategoryChart.dart';
 import 'package:counter/Widget/sectionHeders.dart';
@@ -8,6 +9,7 @@ import 'package:counter/dataBaseHelper.dart';
 import 'package:counter/router/router.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -19,6 +21,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // final Api api = Api();
 
+  final box = GetStorage();
   List<Map<String, dynamic>> expenseList = [];
 
   double balance = 0;
@@ -29,24 +32,36 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController expenceController = TextEditingController();
   TextEditingController nameController = TextEditingController();
 
+  final accountController = Get.find<AccountController>();
+  final categoryController = Get.find<CategoryController>();
+  final transactionController = Get.find<TransactionController>();
+
   @override
   void initState() {
     super.initState();
-    // loadData();
+    loadData();
   }
 
   Future<void> loadData() async {
-    final myAccount = await DatabaseHelper.instance.getAccounts();
+    final userId = box.read('userId');
 
-    setState(() {
-      expenseList = myAccount;
-    });
+    if (userId == null) {
+      debugPrint('User ID not found');
+      return;
+    }
+
+    await Future.wait([
+      accountController.loadData(userId),
+      categoryController.loadData(userId),
+      transactionController.loadData(userId),
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
     final AccountController controller = Get.put(AccountController());
-    final TransactionController transactionController = Get.find<TransactionController>();
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 249, 249, 249),
       body: SafeArea(
@@ -64,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onSeeAllPressed: () => Get.toNamed(Routes.addAccount),
               ),
               const SizedBox(height: 5),
-              Obx(() =>  _accountList(controller)),
+              Obx(() => _accountList(controller)),
               const SizedBox(height: 10),
               const Text(
                 'Spending Overview',
@@ -126,14 +141,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     SizedBox(height: 4), // Spacing between texts
-                   Obx(() =>  Text(
-                      '₹${transactionController.totalMonthExpense.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
+                    Obx(
+                      () => Text(
+                        '₹${transactionController.totalMonthExpense.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),)
+                    ),
                   ],
                 ),
 
@@ -169,15 +186,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _accountList(AccountController controller) {
-     final limitedList = controller.accountList.take(3).toList();
+    final limitedList = controller.accountList.take(3).toList();
     return Flexible(
-      flex :1,
+      flex: 1,
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount:limitedList.length,
+        itemCount: limitedList.length,
         itemBuilder: (context, index) {
-          final iconData = IconData(limitedList[index]['iconCode'],fontFamily: 'MaterialIcons');
+          final iconData = IconData(
+            limitedList[index]['iconCode'],
+            fontFamily: 'MaterialIcons',
+          );
           return Container(
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -194,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               title: Text(
-                 limitedList[index]['name'],
+                limitedList[index]['name'],
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               trailing: Text(

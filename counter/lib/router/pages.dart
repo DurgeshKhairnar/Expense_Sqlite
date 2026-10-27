@@ -2,6 +2,7 @@ import 'package:counter/Navigation/navigationBar.dart';
 import 'package:counter/Pages/addAccount.dart';
 import 'package:counter/Pages/addCategories.dart';
 import 'package:counter/Pages/calculator_screen.dart';
+import 'package:counter/Pages/forgetPassword.dart';
 import 'package:counter/Pages/loginPage.dart';
 import 'package:counter/Pages/signup_screen.dart';
 import 'package:counter/router/router.dart';
@@ -32,6 +33,10 @@ class AppPages {
        GetPage(
           name:Routes.signupScreen,
           page : () => const SignScreen(),
+      ),
+       GetPage(
+          name:Routes.forgetPasswordScreen,
+          page : () => const CreatePasswordScreen(),
       )
   ];
 }
