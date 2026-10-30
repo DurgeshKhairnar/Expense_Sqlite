@@ -377,8 +377,6 @@ class _LoginScreen extends State<LoginScreen> {
       Get.snackbar(
         'Success',
         'Welcome back, ${user['userName']}!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
       );
 
       Get.offAll(() => const MainScreen());

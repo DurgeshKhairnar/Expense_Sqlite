@@ -29,6 +29,7 @@ class _CalculateState extends State<Calculate> {
     '⌫',
     '7',
     '8',
+    '9',
     'X',
     '4',
     '5',

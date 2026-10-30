@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:counter/Controllers/authController.dart';
+import 'package:counter/router/router.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -47,7 +48,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       Get.snackbar(
         'Required Fields',
         'Please fill in all fields.',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
       return;
     }
@@ -56,7 +57,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       Get.snackbar(
         'Weak Password',
         'Password must contain at least 6 characters.',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
       return;
     }
@@ -65,17 +66,20 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       Get.snackbar(
         'Password Mismatch',
         'New password and confirm password do not match.',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
       return;
     }
    final id = await authController.updatePassword(userName: userName, newPassword:password);
    log('update p id = $id');
+   if(id > 0){
+        Get.toNamed(Routes.loginScreen);
+   }
 
     Get.snackbar(
       'Validation Successful',
       'Connect your database to save the new password.',
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
     );
   }
 

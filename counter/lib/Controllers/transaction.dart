@@ -29,10 +29,6 @@ class TransactionController extends GetxController {
   RxInt categoryId = 0.obs;
   RxInt iconCode = 0.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   Future<void> loadData(int id) async {
     final expenseList = await DatabaseHelper.instance.getExpenses(id);

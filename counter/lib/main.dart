@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      initialRoute:Routes.loginScreen,
+      initialRoute:isLogin ? Routes.navigation : Routes.loginScreen,
       getPages : AppPages.router
     );
   }

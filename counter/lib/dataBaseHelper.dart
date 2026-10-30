@@ -107,6 +107,20 @@ Future<Map<String, dynamic>?> checkLogin(String userName, String password) async
 
   return null;
 }
+
+Future<int> updateUserPassword({
+  required String userName,
+  required String newPassword,
+}) async {
+  final db = await database;
+
+  return await db.update(
+    'users',
+    {'password': newPassword},
+    where: 'userName = ?',
+    whereArgs: [userName],
+  );
+}
   Future<void> insertDB(int userId) async {
     final db = await database;
     final List<Map<String, dynamic>> accountsList = [

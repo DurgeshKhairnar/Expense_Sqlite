@@ -333,8 +333,6 @@ class _SignScreen extends State<SignScreen> {
         Get.snackbar(
           'Success',
           'Account created successfully!',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
         );
 
         Get.offNamed(Routes.loginScreen);
