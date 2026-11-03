@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import 'package:counter/dataBaseHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -79,7 +81,7 @@ class TransactionController extends GetxController {
     final yesterday = today.subtract(const Duration(days: 1));
 
    
-
+  
   List<Map<String, dynamic>>  filteredTransactions  = addExpensesList.where((transaction) {
       if (transactionString.value == 'All') {
        return true;
@@ -139,14 +141,17 @@ class TransactionController extends GetxController {
     return grouped;
   }
 
-  // Inside your TransactionController class:
   double get totalMonthExpense {
     double total = 0.0;
 
-    // Loop through all date groups in the current month
     groupedTransactions.forEach((dateHeader, items) {
       for (var item in items) {
-        // Safely parse amount as double
+  
+        final String categoryName = (item['categoryName'] ?? '').toString().trim().toLowerCase();
+
+        if (categoryName == 'salary') {
+          continue; 
+        }
         final double amount = (item['amount'] is num)
             ? (item['amount'] as num).toDouble()
             : double.tryParse(item['amount'].toString()) ?? 0.0;
