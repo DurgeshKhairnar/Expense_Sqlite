@@ -32,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController expenceController = TextEditingController();
   TextEditingController nameController = TextEditingController();
 
-  final accountController = Get.find<AccountController>();
+  final controller = Get.find<AccountController>();
   final categoryController = Get.find<CategoryController>();
   final transactionController = Get.find<TransactionController>();
 
@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     await Future.wait([
-      accountController.loadData(userId),
+      controller.loadData(userId),
       categoryController.loadData(userId),
       transactionController.loadData(userId),
     ]);
