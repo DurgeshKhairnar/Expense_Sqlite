@@ -1,7 +1,7 @@
 import 'package:counter/Navigation/customNavBar.dart';
 import 'package:counter/Pages/budget.dart';
 import 'package:counter/Pages/homePages.dart';
-import 'package:counter/Pages/profile_page.dart';
+import 'package:counter/Pages/setting.dart';
 import 'package:counter/Pages/transactionPage.dart';
 import 'package:counter/router/router.dart';
 import 'package:flutter/material.dart';

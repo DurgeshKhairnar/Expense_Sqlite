@@ -39,24 +39,21 @@ class CustomBottomNavBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // Index 0: Home[cite: 1]
+            
                 _buildNavItem(Icons.home_rounded, 'Home', 0),
-                
-                // Index 1: Transactions[cite: 1]
+              
                 _buildNavItem(Icons.account_balance_wallet_outlined, 'Transactions', 1),
                 
-                const SizedBox(width: 48), // Spacer gap for center button
+                const SizedBox(width: 48),
                 
-                // Index 2: Budget[cite: 1]
                 _buildNavItem(Icons.assignment_outlined, 'Budget', 2),
                 
-                // Index 3: Profile[cite: 1]
-                _buildNavItem(Icons.person_outline_rounded, 'Profile', 3),
+          
+                _buildNavItem(Icons.settings, 'Setting', 3),
               ],
             ),
           ),
-          
-          // Center Floating Plus Button[cite: 1]
+
           Positioned(
             top: -18,
             child: Container(

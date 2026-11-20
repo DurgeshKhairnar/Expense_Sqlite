@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:counter/Controllers/accountController.dart';
 import 'package:counter/Controllers/authController.dart';
 import 'package:counter/Controllers/categoryController.dart';

@@ -5,7 +5,6 @@ import 'package:counter/Controllers/categoryController.dart';
 import 'package:counter/Controllers/transaction.dart';
 import 'package:counter/Widget/expensesCategoryChart.dart';
 import 'package:counter/Widget/sectionHeders.dart';
-import 'package:counter/dataBaseHelper.dart';
 import 'package:counter/router/router.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -59,9 +58,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final AccountController controller = Get.put(AccountController());
-    final TransactionController transactionController =
-        Get.find<TransactionController>();
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 249, 249, 249),
       body: SafeArea(

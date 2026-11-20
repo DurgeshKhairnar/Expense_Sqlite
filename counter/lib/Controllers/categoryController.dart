@@ -21,10 +21,6 @@ List<MaterialColor> lightColors = [
     Colors.pink,
 ].obs;
 
-  @override
-  void onInit(){
-    super.onInit();
-  }
 
   Future<void> loadData(int userId) async{
 
