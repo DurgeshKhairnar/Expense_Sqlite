@@ -4,6 +4,7 @@ import 'package:counter/Pages/addCategories.dart';
 import 'package:counter/Pages/calculator_screen.dart';
 import 'package:counter/Pages/forgetPassword.dart';
 import 'package:counter/Pages/loginPage.dart';
+import 'package:counter/Pages/monthly_budget_screen.dart';
 import 'package:counter/Pages/signup_screen.dart';
 import 'package:counter/router/router.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
@@ -37,6 +38,10 @@ class AppPages {
        GetPage(
           name:Routes.forgetPasswordScreen,
           page : () => const CreatePasswordScreen(),
+      ),
+       GetPage(
+          name:Routes.monthlyBudget,
+          page : () => const Monthly_budget(),
       )
   ];
 }

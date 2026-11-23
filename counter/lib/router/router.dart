@@ -8,5 +8,5 @@ abstract class Routes {
   static const loginScreen = '/loginScreen';
   static const signupScreen = '/signupScreen';
   static const forgetPasswordScreen = '/forgetPasswordScreen';
+  static const monthlyBudget = '/monthlyBudget';
 }
-

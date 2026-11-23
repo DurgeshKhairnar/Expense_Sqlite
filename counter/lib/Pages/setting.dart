@@ -113,7 +113,7 @@ class _ProfilePage extends State<ProfilePage> {
         borderRadius:BorderRadius.circular(10),
       ),
       child: Column(children: [
-          _features(Icon(Icons.money,color:Colors.pink),Colors.pink.shade100,'Monthly Budget','set your monthly budget',logOut),
+          _features(Icon(Icons.money,color:Colors.pink),Colors.pink.shade100,'Monthly Budget','set your monthly budget',gotoMonthlyBudgetScreen),
           _features(Icon(Icons.question_mark,color:Colors.orange),Colors.orange.shade100,'About App','Version 1.0.0',logOut),
           _features(Icon(Icons.logout,color:Colors.red),Colors.red.shade100,'Logout','Sign in from your account',logOut)
     ],));
@@ -122,6 +122,10 @@ class _ProfilePage extends State<ProfilePage> {
   void logOut()async{
       await box.write('isLogin', false);
       Get.toNamed(Routes.loginScreen);
+  }
+
+  void gotoMonthlyBudgetScreen(){
+       Get.toNamed(Routes.monthlyBudget);
   }
 
 }
